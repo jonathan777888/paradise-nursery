@@ -1,18 +1,38 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  removeItem,
-  incrementQuantity,
-  decrementQuantity,
-} from "./CartSlice";
+import { removeItem, updateQuantity } from "./CartSlice";
 
 function CartItem({ setCurrentPage }) {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
 
-  const totalCost = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const calculateTotalCost = (item) => {
+    return item.price * item.quantity;
+  };
+
+  const calculateTotalAmount = () => {
+    return cartItems.reduce(
+      (total, item) => total + calculateTotalCost(item),
+      0
+    );
+  };
+
+  const handleIncrement = (item) => {
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+  };
+
+  const handleDecrement = (item) => {
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
+    }
+  };
+
+  const handleRemove = (id) => {
+    dispatch(removeItem(id));
+  };
+
+  const handleCheckout = () => {
+    alert("Coming Soon");
+  };
 
   return (
     <div>
@@ -30,32 +50,31 @@ function CartItem({ setCurrentPage }) {
       <div className="cart-page">
         <h1>Shopping Cart</h1>
 
-        <p className="cart-total">Total Cost: ${totalCost}</p>
+        <p className="cart-total">Total Cost: ${calculateTotalAmount()}</p>
 
         {cartItems.length === 0 ? (
           <p>Your cart is empty.</p>
         ) : (
           cartItems.map((item) => (
-            <div className="cart-item" key={item.id}>
-              <img src={item.image} alt={item.name} />
+            <div className="cart-item cart-item-card" key={item.id}>
+              <img
+                className="cart-item-image"
+                src={item.image}
+                alt={item.name}
+              />
 
-              <div>
+              <div className="cart-item-details">
                 <h3>{item.name}</h3>
                 <p>Unit Price: ${item.price}</p>
                 <p>Quantity: {item.quantity}</p>
-                <p>Total: ${item.price * item.quantity}</p>
+                <p>Total: ${calculateTotalCost(item)}</p>
 
-                <button onClick={() => dispatch(decrementQuantity(item.id))}>
-                  -
-                </button>
-
-                <button onClick={() => dispatch(incrementQuantity(item.id))}>
-                  +
-                </button>
+                <button onClick={() => handleDecrement(item)}>-</button>
+                <button onClick={() => handleIncrement(item)}>+</button>
 
                 <button
                   className="remove-button"
-                  onClick={() => dispatch(removeItem(item.id))}
+                  onClick={() => handleRemove(item.id)}
                 >
                   Delete
                 </button>
@@ -64,10 +83,7 @@ function CartItem({ setCurrentPage }) {
           ))
         )}
 
-        <button
-          className="checkout-button"
-          onClick={() => alert("Coming Soon")}
-        >
+        <button className="checkout-button" onClick={handleCheckout}>
           Checkout
         </button>
 
