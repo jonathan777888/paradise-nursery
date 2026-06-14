@@ -7,6 +7,10 @@ import AboutUs from "./AboutUs";
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
 
+  const handleGetStartedClick = () => {
+    setCurrentPage("products");
+  };
+
   return (
     <div>
       {currentPage === "home" && (
@@ -14,9 +18,10 @@ function App() {
           <div className="landing-content">
             <h1>Paradise Nursery</h1>
             <p>Your online destination for beautiful indoor plants.</p>
+
             <button
-              className="start-button"
-              onClick={() => setCurrentPage("products")}
+              className="start-button get-started-button"
+              onClick={handleGetStartedClick}
             >
               Get Started
             </button>
